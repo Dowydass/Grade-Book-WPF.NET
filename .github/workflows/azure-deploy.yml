@@ -1,0 +1,45 @@
+name: Azure Deployment
+
+on:
+  workflow_dispatch:  # Manual trigger only to prevent accidental deployments
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Dienynas/**'
+      - '.github/workflows/azure-deploy.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '4.7.2'
+    
+    - name: Restore dependencies
+      run: dotnet restore Dienynas.sln
+      
+    - name: Build
+      run: dotnet build Dienynas.sln --configuration Release --no-restore
+      
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        # Required parameters for SERVICE_PRINCIPAL authentication
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
+    # Add your deployment steps here
+    # Example: Deploy to Azure App Service, Azure Storage, etc.
+    - name: Deploy to Azure
+      run: |
+        echo "Add your deployment commands here"
+        echo "This is a placeholder for actual Azure deployment steps"
